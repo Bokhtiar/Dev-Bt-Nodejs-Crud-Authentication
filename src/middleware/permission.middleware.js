@@ -14,15 +14,17 @@ const isAdmin = async (req, res, next) => {
         const splitToken = await req.headers.authorization.split(' ')[1]
         const decode = await jwt.verify(splitToken, process.env.JWT_SECRET)
 
-        if (decode.role !== "admin") {
+        if (decode.role == "student" || decode.role == "admin") {
+            req.user = decode
+            next()
+        }else {
             return res.status(410).json({
                 status: false,
                 errors: { message: 'You have no permission to access.' }
             })
         }
 
-        req.user = decode
-        next()
+        
     } catch (error) {
         if (error) {
             if (error.name === 'TokenExpiredError') {

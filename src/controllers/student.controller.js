@@ -1,5 +1,8 @@
 
+const { JsonWebTokenError } = require("jsonwebtoken")
+const jwt = require("jsonwebtoken")
 const Student = require("../models/student.model")
+
 
 /* List of items */
 const Index = async (req, res, next) => {
@@ -41,12 +44,16 @@ const Store = async (req, res, next) => {
     try {
         const {
             name,
-            email
+            email,
+            password,
+            role
         } = req.body
 
         const newStudent = new Student({
             name,
-            email
+            email,
+            password,
+            role
         })
 
         await newStudent.save()
@@ -113,10 +120,65 @@ const Destroy = async (req, res, next) => {
     }
 }
 
+
+
+/* student login */
+
+const Login = async (req, res, next) => {
+
+    try {
+        const { email, password } = req.body
+
+        /*account find user */
+        const account = await Student.findOne({email})
+        if(!account) {
+            res.status(403).json({
+                status:false,
+                message: 'email password wrong'
+            })
+        }
+    
+        /*password check */
+        const passwordss = await Student.findOne({password})
+        if(!passwordss) {
+            res.status(403).json({
+                status:false,
+                message: 'email password wrong'
+            })
+        }
+    
+       /* Generate JWT token */
+       const token = await jwt.sign(
+        {
+            id: account._id,
+            name: account.name,
+            role: account.role,
+            permissions: account.permissions,
+        }, process.env.JWT_SECRET, { expiresIn: '1d' }
+    )
+    
+        return res.status(200).json({
+            status: true,
+            token
+        })
+    } catch (error) {
+        if (error) {
+            console.log(error)
+            next(error)
+        }
+    
+    }
+
+
+ 
+}
+
+
 module.exports = {
     Index,
     Show,
     Store,
     Update,
-    Destroy
+    Destroy,
+    Login
 }

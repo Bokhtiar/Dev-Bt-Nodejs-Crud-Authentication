@@ -18,6 +18,16 @@ const studentSchema = new Schema({
         lowercase: true,
         validate: [validateEmail, "Please provide a valid email address"],
     },
+    permissions: [{
+        type: String,
+        trim: true,
+        default: null
+    }],
+    password: {
+        type: String,
+        trim: true,
+        required: true
+    },
     role: {
         type: String,
         trim: true,
