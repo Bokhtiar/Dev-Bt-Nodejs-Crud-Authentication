@@ -5,15 +5,20 @@ const bodyParser = require("body-parser")
 const morgan = require("morgan")
 const mongoose = require("mongoose")
 const dotenv = require("dotenv")
+const fileUpload = require('express-fileupload')
 const appRouter = require("./src/routes")
 
 dotenv.config()
 const app = express()
 
-    app.use(cors())
-    app.use(morgan('dev'))
-    app.use(bodyParser.json())
-    app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors())
+app.use(morgan('dev'))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(fileUpload())
+
+app.use('/uploads/', express.static('uploads/'))
+app.use('/uploads/category', express.static('uploads/category/'))
 
 app.get('/', async (req, res) => {
     res.send("Wow!😯 are you here🙃🙃 but you have no access!!! 😜😜😜")
